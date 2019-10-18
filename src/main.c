@@ -8,6 +8,7 @@
 #include "RF24.h"
 #include "spi.h"
 #include "usart.h"
+#include "led.h"
 
 /*****************************************
  * Private Constant Definitions
@@ -19,8 +20,12 @@
 
 int main(void) {
     mcu_init();
+    led_init();
     MX_USART2_UART_Init();
     MX_SPI1_Init();
+
+    led_control(LED_SHIELD, LED_SET);
+    HAL_Delay(1000);
 
     rf24_t rf24 = rf24_get_default_config();
     rf24.hspi = &hspi1,
@@ -40,8 +45,14 @@ int main(void) {
 
     if (rf24_init(&rf24)) {
         printf("\b\b\b\b\b\b[ OK ]\r\n");
+
+        led_control(LED_SHIELD, LED_RESET);
+        HAL_Delay(300);
+        led_control(LED_SHIELD, LED_SET);
     } else {
         printf("\b\b\b\b\b\b[FAIL]\r\n");
+
+        led_control(LED_SHIELD, RESET);
     }
 
     rf24_dump_registers(&rf24);
