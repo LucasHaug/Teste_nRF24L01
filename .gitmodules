@@ -1,3 +1,6 @@
 [submodule "STM32RF24"]
 	path = lib/STM32RF24
 	url = git@github.com:ThundeRatz/STM32RF24.git
+[submodule "SEGGER_RTT"]
+	path = lib/SEGGER_RTT
+	url = https://github.com/ThundeRatz/SEGGER_RTT.git
