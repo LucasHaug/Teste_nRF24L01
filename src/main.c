@@ -14,6 +14,8 @@
  * Private Constant Definitions
  *****************************************/
 
+uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
+
 /*****************************************
  * Main Function
  *****************************************/
@@ -44,6 +46,7 @@ int main(void) {
     printf("Calling init [....]");
 
     if (rf24_init(&rf24)) {
+        // Deixou praticamente no deafult, só mudou em CONFIG CRCO
         printf("\b\b\b\b\b\b[ OK ]\r\n");
 
         led_control(LED_SHIELD, LED_RESET);
@@ -53,7 +56,19 @@ int main(void) {
         printf("\b\b\b\b\b\b[FAIL]\r\n");
 
         led_control(LED_SHIELD, RESET);
+
+        for (;;)
+            ;
     }
+
+    rf24_dump_registers(&rf24);
+
+    // A partir daq vou configurar como ta no GettingStarted_HandlingData.ino
+
+    rf24_set_output_power(&rf24, RF24_12_dBm);
+
+    rf24_open_writing_pipe(&rf24, addresses[0]);
+    rf24_open_reading_pipe(&rf24, 1, addresses[1]);
 
     rf24_dump_registers(&rf24);
 
