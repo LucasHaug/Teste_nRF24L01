@@ -16,6 +16,8 @@
 
 uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
 
+uint8_t buffer[32];
+
 /*****************************************
  * Main Function
  *****************************************/
@@ -72,7 +74,15 @@ int main(void) {
 
     rf24_dump_registers(&rf24);
 
+    rf24_start_listening(&rf24);
+
     for (;;) {
+        if (rf24_available(&rf24, NULL)) {
+            while (rf24_available(&rf24, NULL)) {
+                rf24_read(&rf24, buffer, 32);
+            }
+        }
+
         rf24_print_status(&rf24);
 
         HAL_Delay(5000);
