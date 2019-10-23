@@ -16,7 +16,11 @@
 
 uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
 
-uint8_t buffer[32];
+uint8_t buffer[15];
+
+// typedef struct data {
+
+// } my_data;
 
 /*****************************************
  * Main Function
@@ -41,6 +45,8 @@ int main(void) {
 
     rf24.irq_port = GPIOB,
     rf24.irq_pin = GPIO_PIN_6,
+
+    rf24.payload_size = 15,
 
     HAL_Delay(10);
 
@@ -79,12 +85,24 @@ int main(void) {
     for (;;) {
         if (rf24_available(&rf24, NULL)) {
             while (rf24_available(&rf24, NULL)) {
-                rf24_read(&rf24, buffer, 32);
+                rf24_read(&rf24, buffer, rf24.payload_size);
             }
+
+            printf("Recebendo: ");
+
+            for (int i = 0; i < rf24.payload_size; i++) {
+                if (i == 12) {
+                    printf(" no. %d", (int) buffer[i]);
+                } else {
+                    printf("%c", (char) buffer[i]);
+                }
+            }
+
+            printf("\n");
         }
 
         rf24_print_status(&rf24);
-
-        HAL_Delay(5000);
+        printf("\n");
+        HAL_Delay(500);
     }
 }
