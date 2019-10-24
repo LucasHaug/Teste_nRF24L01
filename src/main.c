@@ -23,7 +23,7 @@
 
 uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
 
-uint8_t buffer[] = {'V','i','r','t','u','a','l',' ','h','u','g','s', 0 , '\r', '\n'};
+uint8_t buffer[] = {'V', 'i', 'r', 't', 'u', 'a', 'l', ' ', 'h', 'u', 'g', 's', 0, '\r', '\n'};
 
 // typedef struct data {
 
@@ -86,7 +86,7 @@ int main(void) {
     rf24_open_reading_pipe(&rf24, 1, addresses[1]);
 #else
     rf24_open_writing_pipe(&rf24, addresses[1]);
-    // rf24_open_reading_pipe(&rf24, 0, addresses[0]);
+    rf24_open_reading_pipe(&rf24, 1, addresses[0]);
 #endif
 
     rf24_dump_registers(&rf24);
@@ -97,6 +97,7 @@ int main(void) {
 
     for (;;) {
 #if (IS_RECEIVER == 1)
+
         if (rf24_available(&rf24, NULL)) {
             while (rf24_available(&rf24, NULL)) {
                 rf24_read(&rf24, buffer, rf24.payload_size);
@@ -114,6 +115,7 @@ int main(void) {
 
             printf("\r\n");
         }
+
 #else
         printf("Sending Virtual Hug %d!\r\n", buffer[12]);
 
