@@ -7,16 +7,23 @@
 #include "mcu.h"
 #include "RF24.h"
 #include "spi.h"
-#include "usart.h"
 #include "led.h"
 
 /*****************************************
  * Private Constant Definitions
  *****************************************/
 
+#define IS_RECEIVER 0
+
+#define PAYLOAD_SIZE 15
+
+/*****************************************
+ * Private Variables
+ *****************************************/
+
 uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
 
-uint8_t buffer[15];
+uint8_t buffer[] = {'V','i','r','t','u','a','l',' ','h','u','g','s', 0 , '\r', '\n'};
 
 // typedef struct data {
 
@@ -29,7 +36,6 @@ uint8_t buffer[15];
 int main(void) {
     mcu_init();
     led_init();
-    MX_USART2_UART_Init();
     MX_SPI1_Init();
 
     led_control(LED_SHIELD, LED_SET);
@@ -46,7 +52,7 @@ int main(void) {
     rf24.irq_port = GPIOB,
     rf24.irq_pin = GPIO_PIN_6,
 
-    rf24.payload_size = 15,
+    rf24.payload_size = PAYLOAD_SIZE,
 
     HAL_Delay(10);
 
@@ -75,14 +81,22 @@ int main(void) {
 
     rf24_set_output_power(&rf24, RF24_12_dBm);
 
+#if (IS_RECEIVER == 1)
     rf24_open_writing_pipe(&rf24, addresses[0]);
     rf24_open_reading_pipe(&rf24, 1, addresses[1]);
+#else
+    rf24_open_writing_pipe(&rf24, addresses[1]);
+    // rf24_open_reading_pipe(&rf24, 0, addresses[0]);
+#endif
 
     rf24_dump_registers(&rf24);
 
+#if (IS_RECEIVER == 1)
     rf24_start_listening(&rf24);
+#endif
 
     for (;;) {
+#if (IS_RECEIVER == 1)
         if (rf24_available(&rf24, NULL)) {
             while (rf24_available(&rf24, NULL)) {
                 rf24_read(&rf24, buffer, rf24.payload_size);
@@ -98,11 +112,25 @@ int main(void) {
                 }
             }
 
-            printf("\n");
+            printf("\r\n");
+        }
+#else
+        printf("Sending Virtual Hug %d!\r\n", buffer[12]);
+
+        HAL_Delay(500);
+
+        printf("\r\n");
+
+        if (rf24_write(&rf24, buffer, PAYLOAD_SIZE, true)) {
+            printf("Virtual Hug Sent!\r\n");
         }
 
+        printf("\r\n");
+        (buffer[12])++;
+#endif
+
         rf24_print_status(&rf24);
-        printf("\n");
+        printf("\r\n");
         HAL_Delay(500);
     }
 }
