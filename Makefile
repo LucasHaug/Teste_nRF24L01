@@ -1,4 +1,4 @@
-# Name: Makefile_STM
+# Name: Makefile
 # Author: Daniel Nery Silva de Oliveira
 # ThundeRatz Robotics Team
 # 08/2018
@@ -253,8 +253,8 @@ endif
 	@echo "exit" >> $@
 
 # Generate Cube Files
-cube:
-	$(AT)java -jar $(CUBE_JAR) "$(CUBE_DIR)"/"$(PROJECT_NAME)".ioc
+cube: .cube
+	$(AT)java -jar $(CUBE_JAR) -q $<
 
 # Prepare workspace
 # - Erases useless Makefile, renames cube's main.c and links githooks
@@ -335,7 +335,7 @@ help:
 	@echo
 	@echo "Opcoes:"
 	@echo "	help:       mostra essa ajuda"
-	@echo "	cube:       gera arquivos do cube (não funciona no momento por limitações no cube)"
+	@echo "	cube:       gera arquivos do cube"
 	@echo "	prepare:    prepara para compilação inicial apagando arquivos do cube"
 	@echo "	all:        compila todos os arquivos"
 	@echo "	info:       mostra informações sobre o uC conectado"
