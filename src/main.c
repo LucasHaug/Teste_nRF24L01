@@ -123,7 +123,7 @@ int main(void) {
 
         printf("\r\n");
 
-        if (rf24_write(&rf24, buffer, PAYLOAD_SIZE, true)) {
+        if (rf24_write(&rf24, buffer, PAYLOAD_SIZE, false)) {
             printf("Virtual Hug Sent!\r\n");
         }
 
