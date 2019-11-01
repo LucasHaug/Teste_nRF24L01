@@ -58,10 +58,12 @@ int main(void) {
 
     HAL_Delay(10);
 
+    rf24_status_t my_dev_status = RF24_SUCCESS;
+
     printf("================ NRF24 TEST ================\r\n");
     printf("Calling init [....]");
 
-    if (rf24_init(p_dev)) {
+    if (rf24_init(p_dev) == RF24_SUCCESS) {
         // Deixou praticamente no deafult, só mudou em CONFIG CRCO
         printf("\b\b\b\b\b\b[ OK ]\r\n");
 
@@ -77,32 +79,38 @@ int main(void) {
             ;
     }
 
-    rf24_dump_registers(p_dev);
+    // rf24_dump_registers(p_dev);
 
     // A partir daq vou configurar como ta no GettingStarted_HandlingData.ino
 
-    rf24_set_output_power(p_dev, RF24_12_dBm);
+    my_dev_status = rf24_set_output_power(p_dev, RF24_18_dBm);
+
+    // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
 
 #if (IS_RECEIVER == 1)
-    rf24_open_writing_pipe(p_dev, addresses[0]);
-    rf24_open_reading_pipe(p_dev, 1, addresses[1]);
+    my_dev_status = rf24_open_writing_pipe(p_dev, addresses[0]);
+    my_dev_status = rf24_open_reading_pipe(p_dev, 1, addresses[1]);
 #else
-    rf24_open_writing_pipe(p_dev, addresses[1]);
-    rf24_open_reading_pipe(p_dev, 1, addresses[0]);
+    my_dev_status = rf24_open_writing_pipe(p_dev, addresses[1]);
+    my_dev_status = rf24_open_reading_pipe(p_dev, 1, addresses[0]);
 #endif
 
-    rf24_dump_registers(p_dev);
+    printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
+
+    // rf24_dump_registers(p_dev);
 
 #if (IS_RECEIVER == 1)
-    rf24_start_listening(p_dev);
+    my_dev_status = rf24_start_listening(p_dev);
+
+    // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
 #endif
 
     for (;;) {
 #if (IS_RECEIVER == 1)
 
-        if (rf24_available(p_dev, NULL)) {
-            while (rf24_available(p_dev, NULL)) {
-                rf24_read(p_dev, buffer, p_dev->payload_size);
+        if ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
+            while ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
+                my_dev_status = rf24_read(p_dev, buffer, p_dev->payload_size);
             }
 
             printf("Recebendo: ");
@@ -125,7 +133,7 @@ int main(void) {
 
         printf("\r\n");
 
-        if (rf24_write(p_dev, buffer, PAYLOAD_SIZE, true)) {
+        if ((my_dev_status = rf24_write(p_dev, buffer, PAYLOAD_SIZE, false)) == RF24_SUCCESS) {
             printf("Virtual Hug Sent!\r\n");
         }
 
@@ -133,8 +141,10 @@ int main(void) {
         (buffer[12])++;
 #endif
 
-        rf24_print_status(p_dev);
+        // rf24_print_status(p_dev);
         printf("\r\n");
         HAL_Delay(500);
+
+        // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
     }
 }
