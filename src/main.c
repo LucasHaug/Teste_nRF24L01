@@ -5,7 +5,7 @@
  */
 
 #include "mcu.h"
-#include "RF24.h"
+#include "rf24.h"
 #include "spi.h"
 #include "led.h"
 
@@ -13,7 +13,7 @@
  * Private Constant Definitions
  *****************************************/
 
-#define IS_RECEIVER 0
+#define IS_RECEIVER 1
 
 #define PAYLOAD_SIZE 15
 
