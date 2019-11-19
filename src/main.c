@@ -6,6 +6,7 @@
 
 #include "mcu.h"
 #include "rf24.h"
+#include "rf24_debug.h"
 #include "spi.h"
 #include "led.h"
 
@@ -97,7 +98,7 @@ int main(void) {
 
     printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
 
-    // rf24_dump_registers(p_dev);
+    rf24_debug_dump_registers(p_dev);
 
 #if (IS_RECEIVER == 1)
     my_dev_status = rf24_start_listening(p_dev);
@@ -141,7 +142,7 @@ int main(void) {
         (buffer[12])++;
 #endif
 
-        // rf24_print_status(p_dev);
+        rf24_debug_print_status(p_dev);
         printf("\r\n");
         HAL_Delay(500);
 
