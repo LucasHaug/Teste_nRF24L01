@@ -26,15 +26,13 @@ uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0x
 
 uint8_t buffer[] = {'V', 'i', 'r', 't', 'u', 'a', 'l', ' ', 'h', 'u', 'g', 's', 0, '\r', '\n'};
 
-// typedef struct data {
-
-// } my_data;
-
 /*****************************************
  * Main Function
  *****************************************/
 
 int main(void) {
+    /* Init */
+
     mcu_init();
     led_init();
     MX_SPI1_Init();
@@ -42,9 +40,12 @@ int main(void) {
     led_control(LED_SHIELD, LED_SET);
     HAL_Delay(1000);
 
+    /* Device config */
+
     rf24_dev_t* p_dev;
     rf24_dev_t device = rf24_get_default_config();
     p_dev = &device;
+
     p_dev->platform_setup.hspi = &hspi1,
     p_dev->platform_setup.csn_port = GPIOC,
     p_dev->platform_setup.csn_pin = GPIO_PIN_7,
@@ -61,11 +62,13 @@ int main(void) {
 
     rf24_status_t my_dev_status = RF24_SUCCESS;
 
+    /* Test Init */
+
     printf("================ NRF24 TEST ================\r\n");
     printf("Calling init [....]");
 
     if (rf24_init(p_dev) == RF24_SUCCESS) {
-        // Deixou praticamente no deafult, só mudou em CONFIG CRCO
+        /* Deixou praticamente no deafult, só mudou em CONFIG CRCO */
         printf("\b\b\b\b\b\b[ OK ]\r\n");
 
         led_control(LED_SHIELD, LED_RESET);
@@ -80,13 +83,9 @@ int main(void) {
             ;
     }
 
-    // rf24_dump_registers(p_dev);
-
-    // A partir daq vou configurar como ta no GettingStarted_HandlingData.ino
+    /* A partir daq vou configurar como ta no GettingStarted_HandlingData.ino */
 
     my_dev_status = rf24_set_output_power(p_dev, RF24_18_dBm);
-
-    // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
 
 #if (IS_RECEIVER == 1)
     my_dev_status = rf24_open_writing_pipe(p_dev, addresses[0]);
@@ -102,9 +101,13 @@ int main(void) {
 
 #if (IS_RECEIVER == 1)
     my_dev_status = rf24_start_listening(p_dev);
-
-    // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
 #endif
+
+
+
+
+
+    /* Main loop */
 
     for (;;) {
 #if (IS_RECEIVER == 1)
@@ -145,7 +148,5 @@ int main(void) {
         rf24_debug_print_status(p_dev);
         printf("\r\n");
         HAL_Delay(500);
-
-        // printf("\n DEV STATUS = %d\r\n\n", my_dev_status);
     }
 }
