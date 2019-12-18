@@ -9,6 +9,7 @@
 #include "rf24_debug.h"
 #include "spi.h"
 #include "led.h"
+#include "tim.h"
 
 /*****************************************
  * Private Constant Definitions
@@ -36,6 +37,8 @@ int main(void) {
     mcu_init();
     led_init();
     MX_SPI1_Init();
+    MX_TIM2_Init();
+    HAL_TIM_Base_Start(&htim2);
 
     led_control(LED_SHIELD, LED_SET);
     HAL_Delay(1000);
