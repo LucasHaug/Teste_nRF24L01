@@ -15,9 +15,11 @@
  * Private Constant Definitions
  *****************************************/
 
-#define IS_RECEIVER 1
+#define IS_RECEIVER 0
 
-#define PAYLOAD_SIZE 15
+#define ENABLE_AA 0
+
+#define BASE_PAYLOAD_SIZE 15
 
 /*****************************************
  * Private Variables
@@ -25,7 +27,14 @@
 
 uint8_t addresses[2][5] = {{0xE7, 0xE7, 0xE7, 0xE7, 0xE8}, {0xC2, 0xC2, 0xC2, 0xC2, 0xC1}};
 
+#if (ENABLE_AA == 1)
 uint8_t buffer[] = {'V', 'i', 'r', 't', 'u', 'a', 'l', ' ', 'h', 'u', 'g', 's', 0, '\r', '\n'};
+#else
+uint8_t buffer[] = {
+    'V', 'i', 'r', 't', 'u', 'a', 'l', ' ', 'h', 'u', 'g', 's', 0, '\r', '\n',
+    'V', 'i', 'r', 't', 'u', 'a', 'l', ' ', 'h', 'u', 'g', 's', 0, '\r', '\n'
+};
+#endif
 
 /*****************************************
  * Main Function
@@ -59,7 +68,7 @@ int main(void) {
     p_dev->platform_setup.irq_port = GPIOB,
     p_dev->platform_setup.irq_pin = GPIO_PIN_6,
 
-    p_dev->payload_size = PAYLOAD_SIZE,
+    p_dev->payload_size = (BASE_PAYLOAD_SIZE * (2 - ENABLE_AA)),
 
     HAL_Delay(10);
 
@@ -106,19 +115,25 @@ int main(void) {
     my_dev_status = rf24_start_listening(p_dev);
 #endif
 
+    /* Time test variables */
 
-
-
+    uint32_t transmission_delay = 0;
+    uint32_t receiver_delay = 0;
+    uint32_t current_time = 0;
 
     /* Main loop */
 
     for (;;) {
 #if (IS_RECEIVER == 1)
+        printf("Receiving delay: %ld\r\n", receiver_delay);
+        current_time = __HAL_TIM_GET_COUNTER(&htim2);
 
         if ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
             while ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
                 my_dev_status = rf24_read(p_dev, buffer, p_dev->payload_size);
             }
+
+            receiver_delay = __HAL_TIM_GET_COUNTER(&htim2) - current_time;
 
             printf("Recebendo: ");
 
@@ -131,6 +146,8 @@ int main(void) {
             }
 
             printf("\r\n");
+        } else {
+            receiver_delay = 0xFFFF;
         }
 
 #else
@@ -140,8 +157,15 @@ int main(void) {
 
         printf("\r\n");
 
-        if ((my_dev_status = rf24_write(p_dev, buffer, PAYLOAD_SIZE, false)) == RF24_SUCCESS) {
+        printf("Transmission delay: %ld\r\n", transmission_delay);
+        current_time = __HAL_TIM_GET_COUNTER(&htim2);
+
+        if ((my_dev_status =
+                 rf24_write(p_dev, buffer, (BASE_PAYLOAD_SIZE * (2 - ENABLE_AA)), ENABLE_AA)) == RF24_SUCCESS) {
             printf("Virtual Hug Sent!\r\n");
+            transmission_delay = __HAL_TIM_GET_COUNTER(&htim2) - current_time;
+        } else {
+            transmission_delay = 0xFFFF;
         }
 
         printf("\r\n");
