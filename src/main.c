@@ -45,9 +45,9 @@ int main(void) {
 
     /* Device config */
 
-    rf24_dev_t* p_dev;
-    rf24_dev_t device = rf24_get_default_config();
-    p_dev = &device;
+    rf24_dev_t device;
+    rf24_dev_t* p_dev = &device;
+    rf24_get_default_config(p_dev);
 
     p_dev->platform_setup.hspi = &hspi1,
     p_dev->platform_setup.csn_port = GPIOC,
@@ -105,10 +105,6 @@ int main(void) {
 #if (IS_RECEIVER == 1)
     my_dev_status = rf24_start_listening(p_dev);
 #endif
-
-
-
-
 
     /* Main loop */
 
