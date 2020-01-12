@@ -4,6 +4,8 @@
  * @brief Main function
  */
 
+#include <stdio.h>
+
 #include "mcu.h"
 #include "rf24.h"
 #include "rf24_debug.h"
@@ -113,12 +115,12 @@ int main(void) {
 
         if ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
             while ((my_dev_status = rf24_available(p_dev, NULL)) == RF24_SUCCESS) {
-                my_dev_status = rf24_read(p_dev, buffer, p_dev->payload_size);
+                my_dev_status = rf24_read(p_dev, buffer, PAYLOAD_SIZE);
             }
 
             printf("Recebendo: ");
 
-            for (int i = 0; i < p_dev->payload_size; i++) {
+            for (int i = 0; i < PAYLOAD_SIZE; i++) {
                 if (i == 12) {
                     printf(" no. %d", (int) buffer[i]);
                 } else {
@@ -144,7 +146,6 @@ int main(void) {
         (buffer[12])++;
 #endif
 
-        rf24_debug_print_status(p_dev);
         printf("\r\n");
         HAL_Delay(500);
     }
