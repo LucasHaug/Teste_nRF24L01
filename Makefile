@@ -44,6 +44,7 @@ ASM_SOURCES  := $(shell find $(CUBE_DIR) -name "*.s")
 C_SOURCES    := $(shell find src -name "*.c")
 C_HEADERS    := $(shell find inc -name "*.h")
 LIB_SOURCES  :=
+STM32RF24_LIB_HEADERS  := $(shell find $(LIB_DIR)/STM32RF24/inc -name "*.h")
 TEST_HEADERS := $(shell find $(TEST_DIR)/inc -name "*.h")
 TEST_SOURCES := $(shell find $(TEST_DIR)/src -name "*.c")
 
@@ -325,7 +326,7 @@ clean_all:
 
 # Format source code using uncrustify
 format:
-	$(AT)uncrustify -c uncrustify.cfg --replace --no-backup $(C_SOURCES) $(C_HEADERS) $(TEST_HEADERS) $(TEST_SOURCES)
+	$(AT)uncrustify -c uncrustify.cfg --replace --no-backup $(C_SOURCES) $(C_HEADERS) $(TEST_HEADERS) $(TEST_SOURCES) $(LIB_SOURCES) $(STM32RF24_LIB_HEADERS)
 
 # Display help
 help:
