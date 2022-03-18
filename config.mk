@@ -1,13 +1,15 @@
-# Name: Makefile_STM
+# Name: config.mk
 # Author: Daniel Nery Silva de Oliveira
 # ThundeRatz Robotics Team
 # 06/2019
 
 # Cube file name without .ioc extension
-PROJECT_NAME = Teste_nRF24L01
-VERSION := 1
+PROJECT_NAME = teste_nrf24l01
+VERSION := v1
 
-TARGET_BOARD := target_$(PROJECT_NAME)_$(VERSION)
+PROJECT_RELEASE := $(PROJECT_NAME)_$(VERSION)
+
+TARGET_BOARD := target_$(PROJECT_RELEASE)
 
 DEVICE_FAMILY  := STM32F3xx
 DEVICE_TYPE    := STM32F303xx
@@ -33,4 +35,5 @@ TEST_DIR := tests
 # Default values, can be set on the command line or here
 DEBUG   ?= 1
 VERBOSE ?= 0
-TEST    ?= 0
+
+TEST_NAME ?=
